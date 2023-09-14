@@ -1,8 +1,8 @@
 import json
 
 
-inputLogFile = "../DataSet/RawData/intel.clf"
-outputFile = "../DataSet/PreprocessedData/intel_clf"
+inputLogFile = "./DataSet/RawData/intel.clf"
+outputFile = "./DataSet/PreprocessedData/intel_clf"
 
 map = {}
 with open(inputLogFile, "r") as log_file:

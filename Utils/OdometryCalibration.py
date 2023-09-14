@@ -36,12 +36,12 @@ def plotTheta(errorTheta1List, rawMoveList):
 
 
 def main():
-    jsonFile = "../DataSet/PreprocessedData/intel_gfs"
+    jsonFile = "./DataSet/PreprocessedData/intel_gfs"
     with open(jsonFile, 'r') as f:
         input = json.load(f)
         sensorData = input['map']
 
-    jsonFile = "../DataSet/PreprocessedData/intel_corrected_log"
+    jsonFile = "./DataSet/PreprocessedData/intel_corrected_log"
     with open(jsonFile, 'r') as f:
         input = json.load(f)
         gtData = input['map']

@@ -1,6 +1,6 @@
 import json
 
-refTimeJsonFile = "../DataSet/PreprocessedData/intel_raw_refTime"
+refTimeJsonFile = "./DataSet/PreprocessedData/intel_raw_refTime"
 with open(refTimeJsonFile, 'r') as f:
     input = json.load(f)
     mapRef = input['map']
@@ -10,10 +10,10 @@ for key in mapRef:
     #mapRefxytheta[(mapRef[key]['x'], mapRef[key]['y'], mapRef[key]['theta'])] = key
     mapRefrange[tuple(mapRef[key]['range'])] = key
 
-inputGfsFile = "../DataSet/RawData/intel.gfs"
-inputCorrectedLogFile = "../DataSet/RawData/intel.gfs.log"
-outputGfsFile = "../DataSet/PreprocessedData/intel_gfs"
-outputCorrectedLogFile = "../DataSet/PreprocessedData/intel_corrected_log"
+inputGfsFile = "./DataSet/RawData/intel.gfs"
+inputCorrectedLogFile = "./DataSet/RawData/intel.gfs.log"
+outputGfsFile = "./DataSet/PreprocessedData/intel_gfs"
+outputCorrectedLogFile = "./DataSet/PreprocessedData/intel_corrected_log"
 
 mapGfs = {}  # non-corrected
 mapLog = {}  # corrected

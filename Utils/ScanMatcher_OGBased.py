@@ -59,7 +59,7 @@ class ScanMatcher:
             estimatedTheta, rMeasure, xRangeList, yRangeList, self.searchRadius,
                 self.searchHalfRad, coarseSearchStep, estMovingDist, estMovingTheta,fineSearch=False, matchMax=matchMax)
         #########   For Debug Only  #############
-        #if count > 14:
+        # if count > 14:
         #    self.plotMatchOverlay(probSP, matchedPx, matchedPy, matchedReading, xRangeList, yRangeList, coarseSearchStep)
         #########################################
         # Fine Search
@@ -73,9 +73,9 @@ class ScanMatcher:
                 coarseSearchStep, fineSearchHalfRad, fineSearchStep, estMovingDist, estMovingTheta, fineSearch=True, matchMax=True)
 
         #########   For Debug Only  #############
-        #if count > 0:
+        # if count > 0:
         #   self.plotMatchOverlay(probSP, matchedPx, matchedPy, matchedReading, xRangeList, yRangeList, fineSearchStep)
-        #########################################
+        ########################################
         return matchedReading, coarseConfidence
 
     def covertMeasureToXY(self, estimatedX, estimatedY, estimatedTheta, rMeasure):
@@ -151,7 +151,7 @@ class ScanMatcher:
         return matchedPx + dx, matchedPy + dy, matchedReading, convTotal, confidence
 
     def plotMatchOverlay(self, probSP, matchedPx, matchedPy, matchedReading, xRangeList, yRangeList, unitLength):
-        plt.figure(figsize=(19.20, 19.20))
+        plt.figure()
         plt.imshow(probSP, origin='lower')
         pxIdx, pyIdx = self.convertXYToSearchSpaceIdx(matchedPx, matchedPy, xRangeList[0], yRangeList[0], unitLength)
         plt.scatter(pxIdx, pyIdx, c='r', s=5)
@@ -224,7 +224,7 @@ def getMovingTheta(matchedReading, xTrajectory, yTrajectory):
     return movingTheta
 
 def processSensorData(sensorData, og, sm):
-    # gtData = readJson("../DataSet/PreprocessedData/intel_corrected_log") #########   For Debug Only  #############
+    # gtData = readJson("./DataSet/PreprocessedData/intel_corrected_log") #########   For Debug Only  #############
     count = 0
     plt.figure(figsize=(19.20, 19.20))
     colors = iter(cm.rainbow(np.linspace(1, 0, len(sensorData) + 1)))
@@ -292,7 +292,7 @@ def main():
     initMapXLength, initMapYLength, unitGridSize, lidarFOV, lidarMaxRange = 10, 10, 0.02, np.pi, 10 # in Meters
     scanMatchSearchRadius, scanMatchSearchHalfRad, scanSigmaInNumGrid, wallThickness, moveRSigma, maxMoveDeviation, turnSigma, \
         missMatchProbAtCoarse, coarseFactor = 1.4, 0.25, 2, 5 * unitGridSize, 0.1, 0.25, 0.3, 0.15, 5
-    sensorData = readJson("../DataSet/PreprocessedData/intel_gfs")
+    sensorData = readJson("./DataSet/PreprocessedData/intel_gfs")
     numSamplesPerRev = len(sensorData[list(sensorData)[0]]['range'])  # Get how many points per revolution
     initXY = sensorData[sorted(sensorData.keys())[0]]
     og = OccupancyGrid(initMapXLength, initMapYLength, initXY, unitGridSize, lidarFOV, numSamplesPerRev, lidarMaxRange, wallThickness)

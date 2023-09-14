@@ -11,7 +11,7 @@ def updateTrajectoryPlot(matchedReading, xTrajectory, yTrajectory, colors, count
         plt.scatter(x, y, color=next(colors), s=35)
 
 def main():
-    jsonFile = "../DataSet/PreprocessedData/intel_gfs"
+    jsonFile = "./DataSet/PreprocessedData/intel_gfs"
     with open(jsonFile, 'r') as f:
         input = json.load(f)
         map = input['map']

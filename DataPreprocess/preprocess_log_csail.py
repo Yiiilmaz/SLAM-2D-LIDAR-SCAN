@@ -1,14 +1,14 @@
 import json
 
-refTimeJsonFile = "../DataSet/PreprocessedData/csail_gfs"
+refTimeJsonFile = "./DataSet/PreprocessedData/csail_gfs"
 with open(refTimeJsonFile, 'r') as f:
     input = json.load(f)
     mapRef = input['map']
 
 refTimeList = sorted(mapRef.keys())
 
-inputLogFile = "../DataSet/RawData/csail.corrected.log"
-outputFile = "../DataSet/PreprocessedData/csail_corrected_log"
+inputLogFile = "./DataSet/RawData/csail.corrected.log"
+outputFile = "./DataSet/PreprocessedData/csail_corrected_log"
 
 map = {}
 count = 0

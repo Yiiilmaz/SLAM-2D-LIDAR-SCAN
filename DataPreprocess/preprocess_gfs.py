@@ -1,7 +1,7 @@
 import json
 
-inputLogFile = "../DataSet/RawData/csail.corrected.gfs"
-outputFile = "../DataSet/PreprocessedData/csail_gfs"
+inputLogFile = "./DataSet/RawData/csail.corrected.gfs"
+outputFile = "./DataSet/PreprocessedData/csail_gfs"
 
 map = {}
 with open(inputLogFile, "r") as log_file:
