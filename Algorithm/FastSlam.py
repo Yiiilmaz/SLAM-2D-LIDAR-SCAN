@@ -23,6 +23,10 @@ class ParticleFilter:
     def __init__(self, numParticles, ogParameters, smParameters):
         self.numParticles = numParticles
         self.particles = []
+        self.xTrueTrajectory = []
+        self.yTrueTrajectory = []
+        self.xEstTrajectory = []
+        self.yEstTrajectory = []
         self.initParticles(ogParameters, smParameters)
         self.step = 0
         self.prevMatchedReading = None
@@ -168,7 +172,10 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
     for key in sorted(sensorData.keys()):
         count += 1
         print(count)
-
+        pf.xTrueTrajectory.append(sensorData[key]['xx'])
+        pf.yTrueTrajectory.append(sensorData[key]['yy'])
+        pf.xEstTrajectory.append(sensorData[key]['x'])
+        pf.yEstTrajectory.append(sensorData[key]['y'])
         pf.updateParticles(sensorData[key], count)
         if pf.weightUnbalanced():
             #pf.resample()
@@ -180,7 +187,9 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
             if maxWeight < particle.weight:
                 maxWeight = particle.weight
                 bestParticle = particle
-                plt.plot(particle.xTrajectory, particle.yTrajectory)
+                plt.plot(particle.xTrajectory, particle.yTrajectory, color='g')
+                plt.plot(pf.xTrueTrajectory, pf.yTrueTrajectory, color='b')
+                plt.plot(pf.xEstTrajectory, pf.yEstTrajectory, color='r')
 
         xRange, yRange = [0, 20], [0, 20]
         ogMap = bestParticle.og.occupancyGridVisited / bestParticle.og.occupancyGridTotal
@@ -188,7 +197,7 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         ogMap = ogMap[yIdx[0]: yIdx[1], xIdx[0]: xIdx[1]]
         ogMap = np.flipud(1 - ogMap)
         plt.imshow(ogMap, cmap='gray', extent=[xRange[0], xRange[1], yRange[0], yRange[1]])
-        plt.savefig('./Output/nonMoving/' + str(count).zfill(3) + '.png')
+        plt.savefig('./Output/moving/' + str(count).zfill(3) + '.png')
         plt.close()
 
         #if count == 100:
@@ -211,7 +220,7 @@ def main():
     initMapXLength, initMapYLength, unitGridSize, lidarFOV, lidarMaxRange = 50, 50, 0.02, 2*np.pi, 20  # in Meters
     scanMatchSearchRadius, scanMatchSearchHalfRad, scanSigmaInNumGrid, wallThickness, moveRSigma, maxMoveDeviation, turnSigma, \
         missMatchProbAtCoarse, coarseFactor = 1.4, 0.25, 2, 5 * unitGridSize, 0.1, 0.25, 0.3, 0.15, 5
-    sensorData = readJson("./DataSet/PreprocessedData/no_moving")
+    sensorData = readJson("./DataSet/PreprocessedData/moving")
     numSamplesPerRev = len(sensorData[list(sensorData)[0]]['range'])  # Get how many points per revolution
     initXY = sensorData[sorted(sensorData.keys())[0]]
     numParticles = 1
