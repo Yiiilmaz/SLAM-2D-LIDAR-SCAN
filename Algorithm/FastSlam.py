@@ -6,17 +6,7 @@ from Utils.OccupancyGrid import OccupancyGrid
 from Utils.ScanMatcher_OGBased import ScanMatcher
 import math
 import copy
-import tracemalloc
-import linecache
-import os
-
-# Start tracing memory allocations
-tracemalloc.start()
-
-# Your script starts here
-# ...
-
-# Your script ends here
+import sys
 
 
 class ParticleFilter:
@@ -177,9 +167,6 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         pf.xEstTrajectory.append(sensorData[key]['x'])
         pf.yEstTrajectory.append(sensorData[key]['y'])
         pf.updateParticles(sensorData[key], count)
-        if pf.weightUnbalanced():
-            #pf.resample()
-            print("resample")
         
         plt.figure(figsize=(19.20, 19.20))
         maxWeight = -1
@@ -197,7 +184,7 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         ogMap = ogMap[yIdx[0]: yIdx[1], xIdx[0]: xIdx[1]]
         ogMap = np.flipud(1 - ogMap)
         plt.imshow(ogMap, cmap='gray', extent=[xRange[0], xRange[1], yRange[0], yRange[1]])
-        plt.savefig('./Output/moving/' + str(count).zfill(3) + '.png')
+        plt.savefig('./Output/moving/' + sys.argv[1] + str(count).zfill(3) + '.png')
         plt.close()
 
         #if count == 100:
@@ -215,12 +202,18 @@ def readJson(jsonFile):
         input = json.load(f)
         return input['map']
 
+def saveTrajectories(pf):
+    with open("true_trajectory.txt", "w") as f1, open("estimated_trajectory.txt", "w") as f2, open("particle_trajectory.txt", "w") as f3:
+        for i, (xTrue, xEst, particle) in enumerate(zip(pf.xTrueTrajectory, pf.xEstTrajectory, pf.particles)):
+            f1.write(f"{xTrue:.2f} {pf.yTrueTrajectory[i]:.2f}\n")
+            f2.write(f"{xEst:.2f} {pf.yEstTrajectory[i]:.2f}\n")
+            f3.write(f"{particle.xTrajectory[0]:.2f} {particle.yTrajectory[0]:.2f}\n")
 
 def main():
     initMapXLength, initMapYLength, unitGridSize, lidarFOV, lidarMaxRange = 50, 50, 0.02, 2*np.pi, 20  # in Meters
     scanMatchSearchRadius, scanMatchSearchHalfRad, scanSigmaInNumGrid, wallThickness, moveRSigma, maxMoveDeviation, turnSigma, \
         missMatchProbAtCoarse, coarseFactor = 1.4, 0.25, 2, 5 * unitGridSize, 0.1, 0.25, 0.3, 0.15, 5
-    sensorData = readJson("./DataSet/PreprocessedData/moving")
+    sensorData = readJson("./DataSet/PreprocessedData/" + sys.argv[1])
     numSamplesPerRev = len(sensorData[list(sensorData)[0]]['range'])  # Get how many points per revolution
     initXY = sensorData[sorted(sensorData.keys())[0]]
     numParticles = 1
@@ -229,6 +222,8 @@ def main():
         missMatchProbAtCoarse, coarseFactor]
     pf = ParticleFilter(numParticles, ogParameters, smParameters)
     processSensorData(pf, sensorData, plotTrajectory=True)
+    saveTrajectories(pf)
+
 
 if __name__ == '__main__':
     main()
