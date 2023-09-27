@@ -2,12 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "FastSlam moving",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "~/thesis/SLAM-2D-LIDAR-SCAN/Algorithm/FastSlam.py",
             "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "args": ["moving"]
+        },
+        {
+            "name": "FastSlam non_moving",
+            "type": "python",
+            "request": "launch",
+            "program": "~/thesis/SLAM-2D-LIDAR-SCAN/Algorithm/FastSlam.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": ["non_moving"]
         },
         
     ]
