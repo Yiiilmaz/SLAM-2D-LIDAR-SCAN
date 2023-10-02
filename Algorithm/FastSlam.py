@@ -158,7 +158,6 @@ class Particle:
 def processSensorData(pf, sensorData, plotTrajectory = True):
     # gtData = readJson("./DataSet/PreprocessedData/intel_corrected_log") #########   For Debug Only  #############
     count = 0
-    plt.figure(figsize=(19.20, 19.20))
     for key in sorted(sensorData.keys()):
         count += 1
         print(count)
@@ -168,7 +167,6 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         pf.yEstTrajectory.append(sensorData[key]['y'])
         pf.updateParticles(sensorData[key], count)
         
-        plt.figure(figsize=(19.20, 19.20))
         maxWeight = -1
         for particle in pf.particles:
             if maxWeight < particle.weight:
@@ -185,7 +183,7 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         ogMap = np.flipud(1 - ogMap)
         plt.imshow(ogMap, cmap='gray', extent=[xRange[0], xRange[1], yRange[0], yRange[1]])
         plt.savefig('./Output/moving/' + sys.argv[1] + str(count).zfill(3) + '.png')
-        plt.close()
+        plt.clf()
 
         #if count == 100:
         #     break
@@ -203,11 +201,16 @@ def readJson(jsonFile):
         return input['map']
 
 def saveTrajectories(pf):
-    with open("true_trajectory.txt", "w") as f1, open("estimated_trajectory.txt", "w") as f2, open("particle_trajectory.txt", "w") as f3:
-        for i, (xTrue, xEst, particle) in enumerate(zip(pf.xTrueTrajectory, pf.xEstTrajectory, pf.particles)):
-            f1.write(f"{xTrue:.2f} {pf.yTrueTrajectory[i]:.2f}\n")
-            f2.write(f"{xEst:.2f} {pf.yEstTrajectory[i]:.2f}\n")
-            f3.write(f"{particle.xTrajectory[0]:.2f} {particle.yTrajectory[0]:.2f}\n")
+    with open(sys.argv[1] + "true_trajectory.txt", "w") as f1:
+        for i, (xTrue, yTrue) in enumerate(zip(pf.xTrueTrajectory, pf.yTrueTrajectory)):
+            f1.write(f"{xTrue:.2f} {yTrue:.2f}\n")
+    with open(sys.argv[1] + "estimated_trajectory.txt", "w") as f2:
+        for i, (xEst, yEst) in enumerate(zip(pf.xEstTrajectory, pf.yEstTrajectory)):
+            f2.write(f"{xEst:.2f} {yEst:.2f}\n")
+    for i, particle in enumerate(pf.particles):
+        with open(sys.argv[1] + "particle_trajectory" + str(i) + ".txt", "w") as f3:
+            for j, (x, y) in enumerate(zip(particle.xTrajectory, particle.yTrajectory)):
+                f3.write(f"{x:.2f} {y:.2f}\n")
 
 def main():
     initMapXLength, initMapYLength, unitGridSize, lidarFOV, lidarMaxRange = 50, 50, 0.02, 2*np.pi, 20  # in Meters
@@ -221,6 +224,8 @@ def main():
     smParameters = [scanMatchSearchRadius, scanMatchSearchHalfRad, scanSigmaInNumGrid, moveRSigma, maxMoveDeviation, turnSigma, \
         missMatchProbAtCoarse, coarseFactor]
     pf = ParticleFilter(numParticles, ogParameters, smParameters)
+
+    plt.figure(figsize=(19.20, 19.20))
     processSensorData(pf, sensorData, plotTrajectory=True)
     saveTrajectories(pf)
 
