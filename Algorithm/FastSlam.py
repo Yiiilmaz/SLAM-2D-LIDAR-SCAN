@@ -182,7 +182,7 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         ogMap = ogMap[yIdx[0]: yIdx[1], xIdx[0]: xIdx[1]]
         ogMap = np.flipud(1 - ogMap)
         plt.imshow(ogMap, cmap='gray', extent=[xRange[0], xRange[1], yRange[0], yRange[1]])
-        plt.savefig('./Output/moving/' + sys.argv[1] + str(count).zfill(3) + '.png')
+        plt.savefig('./Output/' + sys.argv[1] + '/' + sys.argv[1] + '_' + str(count).zfill(3) + '.png')
         plt.clf()
 
         #if count == 100:
@@ -201,14 +201,14 @@ def readJson(jsonFile):
         return input['map']
 
 def saveTrajectories(pf):
-    with open(sys.argv[1] + "true_trajectory.txt", "w") as f1:
+    with open(sys.argv[1] + "_true_trajectory.txt", "w") as f1:
         for i, (xTrue, yTrue) in enumerate(zip(pf.xTrueTrajectory, pf.yTrueTrajectory)):
             f1.write(f"{xTrue:.2f} {yTrue:.2f}\n")
-    with open(sys.argv[1] + "estimated_trajectory.txt", "w") as f2:
+    with open(sys.argv[1] + "_estimated_trajectory.txt", "w") as f2:
         for i, (xEst, yEst) in enumerate(zip(pf.xEstTrajectory, pf.yEstTrajectory)):
             f2.write(f"{xEst:.2f} {yEst:.2f}\n")
     for i, particle in enumerate(pf.particles):
-        with open(sys.argv[1] + "particle_trajectory" + str(i) + ".txt", "w") as f3:
+        with open(sys.argv[1] + "_particle_trajectory" + str(i) + ".txt", "w") as f3:
             for j, (x, y) in enumerate(zip(particle.xTrajectory, particle.yTrajectory)):
                 f3.write(f"{x:.2f} {y:.2f}\n")
 
