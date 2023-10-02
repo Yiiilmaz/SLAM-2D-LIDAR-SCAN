@@ -104,7 +104,8 @@ class ScanMatcher:
             if estMovingTheta is not None:
                 distv = np.sqrt(np.square(xv) + np.square(yv))
                 distv[distv == 0] = 0.0001
-                thetav = np.arccos((xv * math.cos(estMovingTheta) + yv * math.sin(estMovingTheta)) / distv)
+                # added the multiplication by 0.99999999 to avoid math domain error
+                thetav = np.arccos(0.99999999 * (xv * math.cos(estMovingTheta) + yv * math.sin(estMovingTheta)) / distv)
                 thetaWeight = -1 / (2 * self.turnSigma ** 2) * np.square(thetav)
             else:
                 thetaWeight = np.zeros(xv.shape)
