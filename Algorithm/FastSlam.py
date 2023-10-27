@@ -167,6 +167,9 @@ def processSensorData(pf, sensorData, plotTrajectory = True):
         pf.yEstTrajectory.append(sensorData[key]['y'])
         pf.updateParticles(sensorData[key], count)
         
+        # if pf.weightUnbalanced():
+        #     pf.resample()
+        #     print("resample")
         maxWeight = -1
         for particle in pf.particles:
             if maxWeight < particle.weight:
@@ -213,9 +216,21 @@ def saveTrajectories(pf):
                 f3.write(f"{x:.2f} {y:.2f}\n")
 
 def main():
-    initMapXLength, initMapYLength, unitGridSize, lidarFOV, lidarMaxRange = 50, 50, 0.02, 2*np.pi, 20  # in Meters
-    scanMatchSearchRadius, scanMatchSearchHalfRad, scanSigmaInNumGrid, wallThickness, moveRSigma, maxMoveDeviation, turnSigma, \
-        missMatchProbAtCoarse, coarseFactor = 1.4, 0.25, 2, 5 * unitGridSize, 0.1, 0.25, 0.3, 0.15, 5
+    initMapXLength = 50
+    initMapYLength = 50
+    unitGridSize = 0.04
+    lidarFOV = 2*np.pi
+    lidarMaxRange = 20  # in Meters
+    scanMatchSearchRadius = 1.4
+    scanMatchSearchHalfRad = 0.25
+    scanSigmaInNumGrid = 2
+    wallThickness = 4 * unitGridSize
+    moveRSigma = 0.5
+    maxMoveDeviation = 0.25
+    turnSigma = 0.3
+    missMatchProbAtCoarse = 0.15
+    coarseFactor = 5
+
     sensorData = readJson("./DataSet/PreprocessedData/" + sys.argv[1])
     numSamplesPerRev = len(sensorData[list(sensorData)[0]]['range'])  # Get how many points per revolution
     initXY = sensorData[sorted(sensorData.keys())[0]]

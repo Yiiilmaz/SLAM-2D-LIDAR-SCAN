@@ -5,6 +5,8 @@ import matplotlib.cm as cm
 from Utils.OccupancyGrid import OccupancyGrid
 from scipy.ndimage import gaussian_filter
 import math
+
+
 class ScanMatcher:
     def __init__(self, og, searchRadius, searchHalfRad, scanSigmaInNumGrid, moveRSigma, maxMoveDeviation, turnSigma, missMatchProbAtCoarse, coarseFactor):
         self.searchRadius = searchRadius
@@ -23,9 +25,10 @@ class ScanMatcher:
         yRangeList = [estimatedY - maxScanRadius, estimatedY + maxScanRadius]
         idxEndX, idxEndY = int((xRangeList[1] - xRangeList[0]) / unitLength),  int((yRangeList[1] - yRangeList[0]) / unitLength)
         searchSpace = math.log(missMatchProbAtCoarse) * np.ones((idxEndY + 1, idxEndX + 1))
-
+        # 
         self.og.checkAndExapndOG(xRangeList, yRangeList)
         xRangeListIdx, yRangeListIdx = self.og.convertRealXYToMapIdx(xRangeList, yRangeList)
+        
         ogMap = self.og.occupancyGridVisited[yRangeListIdx[0]: yRangeListIdx[1], xRangeListIdx[0]: xRangeListIdx[1]] /\
                       self.og.occupancyGridTotal[yRangeListIdx[0]: yRangeListIdx[1], xRangeListIdx[0]: xRangeListIdx[1]]
         ogMap = ogMap > 0.5

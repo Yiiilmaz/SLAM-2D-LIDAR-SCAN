@@ -12,6 +12,7 @@ class OccupancyGrid:
         self.OccupancyGridX, self.OccupancyGridY = np.meshgrid(x, y)
         self.occupancyGridVisited = np.ones((xNum + 1, yNum + 1))
         self.occupancyGridTotal = 2 * np.ones((xNum + 1, yNum + 1))
+        self.gridMatchedScan = np.zeros((xNum + 1, yNum + 1))
         self.unitGridSize = unitGridSize
         self.lidarFOV = lidarFOV
         self.lidarMaxRange = lidarMaxRange
@@ -28,6 +29,12 @@ class OccupancyGrid:
         self.radByR = radByR
         # theta= 0 is x direction. spokes=0 is y direc tion, spokesStartIdx is the first ray of lidar scan direction. spokes increase counter-clockwise
         self.spokesStartIdx = int(((self.numSpokes / 2 - self.numSamplesPerRev) / 2) % self.numSpokes)
+
+        self.occupancyGridVisitedPrevious = np.ones((xNum + 1, yNum + 1))
+        self.occupancyGridTotalPrevious = 2 * np.ones((xNum + 1, yNum + 1))
+        self.occupancyGridConfidence = np.zeros((xNum + 1, yNum + 1))
+        self.prevGridMatchedScan = np.zeros((xNum + 1, yNum + 1))
+
 
     def spokesGrid(self):
         # 0th ray is at south, then counter-clock wise increases. Theta 0 is at east.
@@ -80,6 +87,11 @@ class OccupancyGrid:
                                 num=int(gridShape[1] / 5), endpoint=False)
         self.occupancyGridVisited = np.insert(self.occupancyGridVisited, [position], insertion, axis=axis)
         self.occupancyGridTotal = np.insert(self.occupancyGridTotal, [position], 2 * insertion, axis=axis)
+
+        self.occupancyGridConfidence = np.insert(self.occupancyGridConfidence, [position], np.zeros(insertion.shape), axis=axis)
+        self.occupancyGridVisitedPrevious = np.insert(self.occupancyGridVisitedPrevious, [position], insertion, axis=axis)
+        self.occupancyGridTotalPrevious = np.insert(self.occupancyGridTotalPrevious, [position], 2 * insertion, axis=axis)
+        self.prevGridMatchedScan = np.insert(self.prevGridMatchedScan, [position], np.zeros(insertion.shape), axis=axis)
         xv, yv = np.meshgrid(x, y)
         self.OccupancyGridX = np.insert(self.OccupancyGridX, [position], xv, axis=axis)
         self.OccupancyGridY = np.insert(self.OccupancyGridY, [position], yv, axis=axis)
@@ -130,6 +142,11 @@ class OccupancyGrid:
         rMeasure = np.asarray(rMeasure)
         spokesOffsetIdxByTheta = int(np.rint(theta / (2 * np.pi) * self.numSpokes))
         emptyXList, emptyYList, occupiedXList, occupiedYList = [], [], [], []
+
+
+        self.occupancyGridTotalPrevious = self.occupancyGridTotal.copy()
+        self.occupancyGridVisitedPrevious = self.occupancyGridVisited.copy()
+
         for i in range(self.numSamplesPerRev):
             spokeIdx = int(np.rint((self.spokesStartIdx + spokesOffsetIdxByTheta + i) % self.numSpokes))
             xAtSpokeDir = self.radByX[spokeIdx]
@@ -157,6 +174,13 @@ class OccupancyGrid:
                 occupiedYList.extend(y + yAtSpokeDir[occupiedIdx])
         if not update:
             return np.asarray(emptyXList), np.asarray(emptyYList), np.asarray(occupiedXList), np.asarray(occupiedYList)
+        diff1 = self.occupancyGridVisited - self.occupancyGridVisitedPrevious
+        diff2 = self.occupancyGridTotal - self.occupancyGridTotalPrevious
+        print(reading['x'], np.max(diff1), np.min(self.occupancyGridTotal))
+        
+        plt.imsave('gridMatchedScan.png', self.prevGridMatchedScan - (1.5*diff1 - diff2))
+        self.prevGridMatchedScan = (1.5*diff1 - diff2)
+        i = 1
 
     def plotOccupancyGrid(self, xRange = None, yRange= None, plotThreshold = True):
         if xRange is None or xRange[0] < self.mapXLim[0] or xRange[1] > self.mapXLim[1]:
